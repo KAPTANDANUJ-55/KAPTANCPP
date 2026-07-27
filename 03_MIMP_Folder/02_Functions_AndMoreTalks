@@ -1,0 +1,132 @@
+#include <iostream>
+#include <vector>
+#include <algorithm> // std::sort ke liye
+
+using namespace std;
+
+// ==========================================
+// 1. Pass By Value vs Reference vs Pointer
+// ==========================================
+
+// Pass by Value (Creates Copy - Slow for large data)
+void swapByValue(int a, int b) {
+    int temp = a;
+    a = b;
+    b = temp; // Changes local copy, original unmodified
+}
+
+// Pass by Reference (Modifies original - O(1) Overhead) -> DSA Favorite!
+void swapByReference(int& a, int& b) {
+    int temp = a;
+    a = b;
+    b = temp; // Directly alters original memory locations
+}
+
+// Pass by Pointer (Explicit address passing)
+void swapByPointer(int* ptr1, int* ptr2) {
+    if (ptr1 != nullptr && ptr2 != nullptr) { // Null Safety Check
+        int temp = *ptr1;
+        *ptr1 = *ptr2;
+        *ptr2 = temp;
+    }
+}
+
+// ==========================================
+// 2. Heavy DSA Data Structure & const Ref
+// ==========================================
+// Pass Large Vector by Const Reference (Fast & Read-Only)
+void printVector(const vector<int>& vec) {
+    // vec.push_back(100); // ERROR! Read-only reference hai
+    cout << "Vector elements: ";
+    for (int num : vec) {
+        cout << num << " ";
+    }
+    cout << endl;
+}
+
+// ==========================================
+// 3. Function Pointer & Custom Comparator
+// ==========================================
+
+// Comparator Functions for Sorting
+bool ascending(int a, int b) {
+    return a < b;
+}
+
+bool descending(int a, int b) {
+    return a > b;
+}
+
+// Function taking a FUNCTION POINTER as an argument (Callback Mechanic)
+void customSort(vector<int>& vec, bool (*compareFunc)(int, int)) {
+    // Basic Bubble Sort using custom functional logic
+    int n = vec.size();
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (compareFunc(vec[j+1], vec[j])) { // Calling function via pointer
+                swapByReference(vec[j], vec[j+1]);
+            }
+        }
+    }
+}
+
+// ==========================================
+// 4. Inline Function & Static Variable Scope
+// ==========================================
+inline int square(int x) { return x * x; }
+
+void demonstrateStaticScope() {
+    // Static variable persistent memory me rehta hai (Program runtime tak live rehta hai)
+    static int counter = 0; 
+    counter++;
+    cout << "Function called " << counter << " time(s)" << endl;
+}
+
+// ==========================================
+// MAIN EXECUTION
+// ==========================================
+int main() {
+    cout << "=== 1. Parameter Passing Mechanisms ===" << endl;
+    int x = 10, y = 20;
+
+    cout << "Original: x = " << x << ", y = " << y << endl;
+
+    swapByValue(x, y);
+    cout << "After Pass-by-Value:     x = " << x << ", y = " << y << " (No Change)" << endl;
+
+    swapByReference(x, y);
+    cout << "After Pass-by-Reference: x = " << x << ", y = " << y << " (Swapped!)" << endl;
+
+    swapByPointer(&x, &y);
+    cout << "After Pass-by-Pointer:   x = " << x << ", y = " << y << " (Swapped back!)" << endl;
+
+
+    cout << "\n=== 2. Efficient Data Handling for DSA ===" << endl;
+    vector<int> myData = {50, 10, 40, 20, 30};
+    printVector(myData);
+
+
+    cout << "\n=== 3. Function Pointers & Callbacks ===" << endl;
+    
+    // Declaring a function pointer: ReturnType (*PointerName)(ParamTypes...)
+    bool (*sortLogic)(int, int) = descending;
+
+    cout << "Sorting in Descending Order using Function Pointer:" << endl;
+    customSort(myData, sortLogic);
+    printVector(myData);
+
+    cout << "Sorting in Ascending Order using Lambda Function (Modern C++):" << endl;
+    // Lambda syntax: [](params){ body }
+    customSort(myData, [](int a, int b) { return a < b; });
+    printVector(myData);
+
+
+    cout << "\n=== 4. Inline Functions & Static Scope ===" << endl;
+    cout << "Square of 7 (Inline): " << square(7) << endl;
+
+    demonstrateStaticScope();
+    demonstrateStaticScope();
+    demonstrateStaticScope();
+
+    return 0;
+}
